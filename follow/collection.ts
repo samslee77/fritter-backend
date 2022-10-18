@@ -21,7 +21,7 @@ class FollowCollection {
   static async addOne(user: User): Promise<HydratedDocument<User>> {
     const follow = new FollowModel({
       user: user,
-      followers: [], 
+      followers: [],
       following: []
     });
     await follow.save(); // Saves follow to MongoDB

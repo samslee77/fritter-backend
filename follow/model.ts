@@ -10,12 +10,10 @@ export type Follow = {
 };
 
 const FollowSchema = new Schema({
-  // The usere
   user: {
     type: Schema.Types.ObjectId,
     required: true
   },
-  // The user's verification status
   followers: {
     type: Schema.Types.ObjectId,
     required: true
