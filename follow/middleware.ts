@@ -1,18 +1,20 @@
 import type {Request, Response, NextFunction} from 'express';
 import {Types} from 'mongoose';
 import FollowCollection from '../follow/collection';
+import UserCollection from '../user/collection';
 
-/**
- * Checks if a freet with freetId is req.params exists
- */
-const isFreetExists = async (req: Request, res: Response, next: NextFunction) => {
-  const validFormat = Types.ObjectId.isValid(req.params.freetId);
-  const freet = validFormat ? await FreetCollection.findOne(req.params.freetId) : '';
-  if (!freet) {
+const doesUsernameExist = async (req: Request, res: Response, next: NextFunction) => {
+  if (req.body.username) {
+    const user = await UserCollection.findOneByUsername(req.body.username as string);
+    if (!user) {
+      res.status(404).json({
+        error: `A user with username ${req.query.username as string} does not exist.`
+      });
+      return;
+    }
+  } else {
     res.status(404).json({
-      error: {
-        freetNotFound: `Freet with freet ID ${req.params.freetId} does not exist.`
-      }
+      error: 'Provided username must be nonempty.'
     });
     return;
   }
@@ -20,38 +22,60 @@ const isFreetExists = async (req: Request, res: Response, next: NextFunction) =>
   next();
 };
 
-/**
- * Checks if the content of the freet in req.body is valid, i.e not a stream of empty
- * spaces and not more than 140 characters
- */
-const isValidFreetContent = (req: Request, res: Response, next: NextFunction) => {
-  const {content} = req.body as {content: string};
-  if (!content.trim()) {
-    res.status(400).json({
-      error: 'Freet content must be at least one character long.'
-    });
-    return;
-  }
+const doesFollowExist = async (req: Request, res: Response, next: NextFunction) => {
+  const followAccount = await UserCollection.findOneByUsername(req.body.username as string);
 
-  if (content.length > 140) {
-    res.status(413).json({
-      error: 'Freet content must be no more than 140 characters.'
-    });
-    return;
-  }
-
-  next();
-};
-
-/**
- * Checks if the current user is the author of the freet whose freetId is in req.params
- */
-const isValidFreetModifier = async (req: Request, res: Response, next: NextFunction) => {
-  const freet = await FreetCollection.findOne(req.params.freetId);
-  const userId = freet.authorId._id;
-  if (req.session.userId !== userId.toString()) {
+  const currUserId = (req.session.userId as string) ?? '';
+  const currUser = await UserCollection.findOneByUserId(currUserId);
+  const follow = await FollowCollection.viewFollow(currUser, followAccount);
+  if (follow) {
     res.status(403).json({
-      error: 'Cannot modify other users\' freets.'
+      error: `You are already following the user with username ${req.body.username as string}.`
+    });
+    return;
+  }
+
+  next();
+};
+
+const doesFollowNotExist = async (req: Request, res: Response, next: NextFunction) => {
+  const followAccount = await UserCollection.findOneByUsername(req.body.username as string);
+
+  const currUserId = (req.session.userId as string) ?? '';
+  const currUser = await UserCollection.findOneByUserId(currUserId);
+  const follow = await FollowCollection.viewFollow(currUser, followAccount);
+  if (!follow) {
+    res.status(403).json({
+      error: `You are not following the user with username ${req.body.username as string}.`
+    });
+    return;
+  }
+
+  next();
+};
+
+const doesFollowerExist = async (req: Request, res: Response, next: NextFunction) => {
+  const follower = await UserCollection.findOneByUsername(req.body.username as string);
+
+  const currUserId = (req.session.userId as string) ?? '';
+  const currUser = await UserCollection.findOneByUserId(currUserId);
+  const follow = await FollowCollection.viewFollow(follower, currUser);
+  if (!follow) {
+    res.status(404).json({
+      error: `The user with username ${req.body.username as string} is not following you.`
+    });
+    return;
+  }
+
+  next();
+};
+
+const isFollowUser = async (req: Request, res: Response, next: NextFunction) => {
+  const currUser = await UserCollection.findOneByUserId((req.session.userId as string) ?? '');
+
+  if (currUser.username === req.body.username) {
+    res.status(409).json({
+      error: 'You cannot follow yourself.'
     });
     return;
   }
@@ -60,7 +84,9 @@ const isValidFreetModifier = async (req: Request, res: Response, next: NextFunct
 };
 
 export {
-  isValidFreetContent,
-  isFreetExists,
-  isValidFreetModifier
+  doesUsernameExist,
+  doesFollowExist,
+  doesFollowNotExist,
+  doesFollowerExist,
+  isFollowUser
 };

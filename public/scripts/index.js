@@ -41,7 +41,12 @@ const formsAndHandlers = {
   'delete-freet': deleteFreet,
   'verify-user': changeVerificationStatus,
   'see-verification-status': seeVerificationStatus,
-  'see-verification-status-other': seeVerificationStatusOfOther
+  'see-verification-status-other': seeVerificationStatusOfOther,
+  'follow-user': follow,
+  'unfollow-user': unfollow,
+  'remove-follower': removeFollower,
+  'users-you-are-following': viewFollowing,
+  'your-followers': viewFollowers
 };
 
 // Attach handlers to forms

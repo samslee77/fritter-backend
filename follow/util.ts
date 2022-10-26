@@ -1,48 +1,35 @@
 import type {HydratedDocument} from 'mongoose';
 import moment from 'moment';
-import type {Freet, PopulatedFreet} from '../freet/model';
+import type {Follow} from '../follow/model';
+import UserCollection from '../user/collection';
 
-// Update this if you add a property to the Freet type!
-type FreetResponse = {
+type FollowResponse = {
   _id: string;
-  author: string;
-  dateCreated: string;
-  content: string;
-  dateModified: string;
+  follower: string;
+  following: string;
 };
 
 /**
- * Encode a date as an unambiguous string
  *
- * @param {Date} date - A date object
- * @returns {string} - formatted date as string
- */
-const formatDate = (date: Date): string => moment(date).format('MMMM Do YYYY, h:mm:ss a');
-
-/**
- * Transform a raw Freet object from the database into an object
- * with all the information needed by the frontend
  *
- * @param {HydratedDocument<Freet>} freet - A freet
- * @returns {FreetResponse} - The freet object formatted for the frontend
+ * @param {HydratedDocument<Follow>} follow - A follow map for a user
+ * @returns {FollowResponse} - The follow object formatted for the frontend
  */
-const constructFreetResponse = (freet: HydratedDocument<Freet>): FreetResponse => {
-  const freetCopy: PopulatedFreet = {
-    ...freet.toObject({
+const constructFollowResponse = (follow: HydratedDocument<Follow>): FollowResponse => {
+  const followCopy: Follow = {
+    ...follow.toObject({
       versionKey: false // Cosmetics; prevents returning of __v property
     })
   };
-  const {username} = freetCopy.authorId;
-  delete freetCopy.authorId;
+
   return {
-    ...freetCopy,
-    _id: freetCopy._id.toString(),
-    author: username,
-    dateCreated: formatDate(freet.dateCreated),
-    dateModified: formatDate(freet.dateModified)
+    ...followCopy,
+    _id: followCopy._id.toString(),
+    follower: followCopy.follower.username,
+    following: followCopy.following.username
   };
 };
 
 export {
-  constructFreetResponse
+  constructFollowResponse
 };

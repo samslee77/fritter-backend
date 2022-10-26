@@ -1,134 +1,137 @@
 import type {NextFunction, Request, Response} from 'express';
 import express from 'express';
-import FreetCollection from './collection';
 import * as userValidator from '../user/middleware';
-import * as freetValidator from '../freet/middleware';
+import * as followValidator from '../follow/middleware';
 import * as util from './util';
+import UserCollection from '../user/collection';
+import FollowCollection from './collection';
 
 const router = express.Router();
 
 /**
- * Get all the freets
+ * Get the list of all followers of the user currently logged in
  *
- * @name GET /api/freets
+ * @name GET /api/Follow/followers
  *
- * @return {FreetResponse[]} - A list of all the freets sorted in descending
- *                      order by date modified
- */
-/**
- * Get freets by author.
- *
- * @name GET /api/freets?authorId=id
- *
- * @return {FreetResponse[]} - An array of freets created by user with id, authorId
- * @throws {400} - If authorId is not given
- * @throws {404} - If no user has given authorId
- *
+ * @return {Users[]} - A list of all the Users following the current User
  */
 router.get(
-  '/',
-  async (req: Request, res: Response, next: NextFunction) => {
-    // Check if authorId query parameter was supplied
-    if (req.query.author !== undefined) {
-      next();
-      return;
-    }
-
-    const allFreets = await FreetCollection.findAll();
-    const response = allFreets.map(util.constructFreetResponse);
-    res.status(200).json(response);
-  },
+  '/followers',
   [
-    userValidator.isAuthorExists
+    userValidator.isUserLoggedIn
   ],
-  async (req: Request, res: Response) => {
-    const authorFreets = await FreetCollection.findAllByUsername(req.query.author as string);
-    const response = authorFreets.map(util.constructFreetResponse);
-    res.status(200).json(response);
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = (req.session.userId as string) ?? '';
+    const user = await UserCollection.findOneByUserId(userId);
+    const followers = await FollowCollection.viewAllFollowers(user);
+    res.status(200).json({
+      message: 'Here are your followers.',
+      follow: followers.map(util.constructFollowResponse)
+    });
   }
 );
 
 /**
- * Create a new freet.
+ * Get the list of all the users that the current user is following
  *
- * @name POST /api/freets
+ * @name GET /api/Follow/following
  *
- * @param {string} content - The content of the freet
- * @return {FreetResponse} - The created freet
- * @throws {403} - If the user is not logged in
- * @throws {400} - If the freet content is empty or a stream of empty spaces
- * @throws {413} - If the freet content is more than 140 characters long
+ */
+router.get(
+  '/following',
+  [
+    userValidator.isUserLoggedIn
+  ],
+  async (req: Request, res: Response, next: NextFunction) => {
+    // Check if authorId query parameter was supplied
+    const userId = (req.session.userId as string) ?? '';
+    const user = await UserCollection.findOneByUserId(userId);
+    const following = await FollowCollection.viewAllFollowing(user);
+    res.status(200).json({
+      message: 'Here are the users you are following.',
+      follow: following.map(util.constructFollowResponse)
+    });
+  }
+);
+
+/**
+ * Add a follower-following relationship
+ *
+ * @name POST /api/Follow
+ *
  */
 router.post(
   '/',
   [
     userValidator.isUserLoggedIn,
-    freetValidator.isValidFreetContent
+    followValidator.doesUsernameExist,
+    followValidator.doesFollowExist,
+    followValidator.isFollowUser
   ],
   async (req: Request, res: Response) => {
-    const userId = (req.session.userId as string) ?? ''; // Will not be an empty string since its validated in isUserLoggedIn
-    const freet = await FreetCollection.addOne(userId, req.body.content);
+    const follower = (req.session.userId as string) ?? ''; // Will not be an empty string since its validated in isUserLoggedIn
+    const followerUser = await UserCollection.findOneByUserId(follower);
 
+    const following = (req.body.username as string) ?? '';
+    const followingUser = await UserCollection.findOneByUsername(following);
+
+    const follow = await FollowCollection.addFollow(followerUser, followingUser);
     res.status(201).json({
-      message: 'Your freet was created successfully.',
-      freet: util.constructFreetResponse(freet)
+      message: 'You have successfully followed the user.',
+      follow: util.constructFollowResponse(follow)
     });
   }
 );
 
 /**
- * Delete a freet
+ * Remove a follower-following relationship
  *
- * @name DELETE /api/freets/:id
+ * @name DELETE /api/Follow
  *
  * @return {string} - A success message
- * @throws {403} - If the user is not logged in or is not the author of
- *                 the freet
- * @throws {404} - If the freetId is not valid
  */
 router.delete(
-  '/:freetId?',
+  '/',
   [
     userValidator.isUserLoggedIn,
-    freetValidator.isFreetExists,
-    freetValidator.isValidFreetModifier
+    followValidator.doesUsernameExist,
+    followValidator.doesFollowNotExist
   ],
-  async (req: Request, res: Response) => {
-    await FreetCollection.deleteOne(req.params.freetId);
+  async (req: Request, res: Response, next: NextFunction) => {
+    const currUserId = (req.session.userId as string) ?? '';
+    const currUser = await UserCollection.findOneByUserId(currUserId);
+    const followed = await UserCollection.findOneByUsername(req.body.username);
+    await FollowCollection.removeFollow(currUser, followed);
     res.status(200).json({
-      message: 'Your freet was deleted successfully.'
+      message: 'This follow relationship has successfully been removed.'
     });
   }
 );
 
 /**
- * Modify a freet
+ * Remove a follower-following relationship
  *
- * @name PUT /api/freets/:id
+ * @name DELETE /api/Follow/follow
  *
- * @param {string} content - the new content for the freet
- * @return {FreetResponse} - the updated freet
- * @throws {403} - if the user is not logged in or not the author of
- *                 of the freet
- * @throws {404} - If the freetId is not valid
- * @throws {400} - If the freet content is empty or a stream of empty spaces
- * @throws {413} - If the freet content is more than 140 characters long
+ * @return {string} - A success message
  */
-router.put(
-  '/:freetId?',
+router.delete(
+  '/remove',
   [
     userValidator.isUserLoggedIn,
-    freetValidator.isFreetExists,
-    freetValidator.isValidFreetModifier,
-    freetValidator.isValidFreetContent
+    followValidator.doesUsernameExist,
+    followValidator.doesFollowerExist
   ],
-  async (req: Request, res: Response) => {
-    const freet = await FreetCollection.updateOne(req.params.freetId, req.body.content);
+  async (req: Request, res: Response, next: NextFunction) => {
+    const currUserId = (req.session.userId as string) ?? '';
+    const currUser = await UserCollection.findOneByUserId(currUserId);
+
+    const followed = await UserCollection.findOneByUsername(req.body.username);
+    await FollowCollection.removeFollow(followed, currUser);
     res.status(200).json({
-      message: 'Your freet was updated successfully.',
-      freet: util.constructFreetResponse(freet)
+      message: 'This follow relationship has successfully been removed.'
     });
   }
 );
 
-export {router as freetRouter};
+export {router as followRouter};
