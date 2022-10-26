@@ -1,6 +1,6 @@
 import type {HydratedDocument} from 'mongoose';
 import moment from 'moment';
-import type {Follow} from '../follow/model';
+import type {Follow, PopulatedFollow} from '../follow/model';
 import UserCollection from '../user/collection';
 
 type FollowResponse = {
@@ -16,7 +16,7 @@ type FollowResponse = {
  * @returns {FollowResponse} - The follow object formatted for the frontend
  */
 const constructFollowResponse = (follow: HydratedDocument<Follow>): FollowResponse => {
-  const followCopy: Follow = {
+  const followCopy: PopulatedFollow = {
     ...follow.toObject({
       versionKey: false // Cosmetics; prevents returning of __v property
     })

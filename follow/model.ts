@@ -4,6 +4,12 @@ import type {User} from '../user/model';
 
 export type Follow = {
   _id: Types.ObjectId; // MongoDB assigns each object this ID on creation
+  follower: Types.ObjectId;
+  following: Types.ObjectId;
+};
+
+export type PopulatedFollow = {
+  _id: Types.ObjectId; // MongoDB assigns each object this ID on creation
   follower: User;
   following: User;
 };
@@ -11,11 +17,13 @@ export type Follow = {
 const FollowSchema = new Schema({
   follower: {
     type: Schema.Types.ObjectId,
-    required: true
+    required: true,
+    ref: 'User'
   },
   following: {
     type: Schema.Types.ObjectId,
-    required: true
+    required: true,
+    ref: 'User'
   }
 });
 

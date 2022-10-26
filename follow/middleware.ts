@@ -8,7 +8,7 @@ const doesUsernameExist = async (req: Request, res: Response, next: NextFunction
     const user = await UserCollection.findOneByUsername(req.body.username as string);
     if (!user) {
       res.status(404).json({
-        error: `A user with username ${req.query.username as string} does not exist.`
+        error: `A user with username ${req.body.username as string} does not exist.`
       });
       return;
     }
@@ -24,10 +24,10 @@ const doesUsernameExist = async (req: Request, res: Response, next: NextFunction
 
 const doesFollowExist = async (req: Request, res: Response, next: NextFunction) => {
   const followAccount = await UserCollection.findOneByUsername(req.body.username as string);
+  const followUsersId = followAccount._id;
 
   const currUserId = (req.session.userId as string) ?? '';
-  const currUser = await UserCollection.findOneByUserId(currUserId);
-  const follow = await FollowCollection.viewFollow(currUser, followAccount);
+  const follow = await FollowCollection.viewFollow(currUserId, followUsersId);
   if (follow) {
     res.status(403).json({
       error: `You are already following the user with username ${req.body.username as string}.`
@@ -40,10 +40,10 @@ const doesFollowExist = async (req: Request, res: Response, next: NextFunction) 
 
 const doesFollowNotExist = async (req: Request, res: Response, next: NextFunction) => {
   const followAccount = await UserCollection.findOneByUsername(req.body.username as string);
+  const followUsersId = followAccount._id;
 
   const currUserId = (req.session.userId as string) ?? '';
-  const currUser = await UserCollection.findOneByUserId(currUserId);
-  const follow = await FollowCollection.viewFollow(currUser, followAccount);
+  const follow = await FollowCollection.viewFollow(currUserId, followUsersId);
   if (!follow) {
     res.status(403).json({
       error: `You are not following the user with username ${req.body.username as string}.`
@@ -56,10 +56,10 @@ const doesFollowNotExist = async (req: Request, res: Response, next: NextFunctio
 
 const doesFollowerExist = async (req: Request, res: Response, next: NextFunction) => {
   const follower = await UserCollection.findOneByUsername(req.body.username as string);
+  const followerId = follower._id;
 
   const currUserId = (req.session.userId as string) ?? '';
-  const currUser = await UserCollection.findOneByUserId(currUserId);
-  const follow = await FollowCollection.viewFollow(follower, currUser);
+  const follow = await FollowCollection.viewFollow(followerId, currUserId);
   if (!follow) {
     res.status(404).json({
       error: `The user with username ${req.body.username as string} is not following you.`

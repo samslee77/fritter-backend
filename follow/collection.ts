@@ -18,29 +18,34 @@ class FollowCollection {
    * @param {User} user - The author of the freet
    * @return {Promise<HydratedDocument<User>>} - The newly added follower
    */
-  static async addFollow(follower: User, following: User): Promise<HydratedDocument<Follow>> {
+  static async addFollow(follower: Types.ObjectId | string, following: Types.ObjectId | string): Promise<HydratedDocument<Follow>> {
     const follow = new FollowModel({follower, following});
     await follow.save();
-    return follow;
+    return follow.populate(['follower', 'following']);
   }
 
-  static async removeFollow(follower: User, following: User): Promise<void> {
+  static async removeFollow(follower: Types.ObjectId | string, following: Types.ObjectId | string): Promise<void> {
     const follow = await FollowModel.deleteOne({follower, following});
   }
 
-  static async viewFollow(follower: User, following: User): Promise<HydratedDocument<Follow>> {
+  static async removeAllFollowsWithUser(user: Types.ObjectId | string): Promise<void> {
+    const delete1 = await FollowModel.deleteMany({follower: user});
+    const delete2 = await FollowModel.deleteMany({following: user});
+  }
+
+  static async viewFollow(follower: Types.ObjectId | string, following: Types.ObjectId | string): Promise<HydratedDocument<Follow>> {
     const follow = await FollowModel.findOne({follower, following});
     return follow;
   }
 
-  static async viewAllFollowers(following: User): Promise<Array<HydratedDocument<Follow>>> {
-    const followers = await FollowModel.find({following: following});
+  static async viewAllFollowers(following: Types.ObjectId | string): Promise<Array<HydratedDocument<Follow>>> {
+    const followers = await FollowModel.find({following: following}).populate(['follower', 'following']);
     return followers;
   }
 
-  static async viewAllFollowing(follower: User): Promise<Array<HydratedDocument<Follow>>> {
-    const following = await FollowModel.find({follower: follower});
-    return following;
+  static async viewAllFollowing(follower: Types.ObjectId | string): Promise<Array<HydratedDocument<Follow>>> {
+    const followings = await FollowModel.find({follower: follower}).populate(['follower', 'following']);
+    return followings;
   }
 }
 
