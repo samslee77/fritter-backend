@@ -18,18 +18,26 @@ class FollowCollection {
    * @param {User} user - The author of the freet
    * @return {Promise<HydratedDocument<User>>} - The newly added follower
    */
-  static async addOne(user: User): Promise<HydratedDocument<User>> {
-    const follow = new FollowModel({
+  static async addOne(user: User, follower: User): Promise<HydratedDocument<User>> {
+    const newfollower = new FollowModel({
       user: user,
-      followers: [],
+      followers: [follower],
       following: []
     });
-    await follow.save(); // Saves follow to MongoDB
-    return follow.populate('authorId');
+
+    const newfollowing = new FollowModel({
+      user: follower,
+      followers: [],
+      following: [user]
+    });
+
+    await newfollower.save(); // Saves follow to MongoDB
+    await newfollowing.save();
+    return newfollower.populate(user);
   }
 
   /**
-   * Find the list of follwoers of a user
+   * Find the list of followers of a user
    *
    * @param {string} freetId - The id of the freet to find
    * @return {Promise<HydratedDocument<Freet>> | Promise<null> } - The freet with the given freetId, if any

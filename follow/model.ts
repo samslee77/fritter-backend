@@ -15,11 +15,11 @@ const FollowSchema = new Schema({
     required: true
   },
   followers: {
-    type: Schema.Types.ObjectId,
+    type: [Schema.Types.ObjectId],
     required: true
   },
   following: {
-    type: Schema.Types.ObjectId,
+    type: [Schema.Types.ObjectId],
     required: true
   }
 });

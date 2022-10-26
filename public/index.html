@@ -7,7 +7,9 @@
   <link rel="stylesheet" href="/stylesheets/style.css">
   <script src="/scripts/freet.js"></script>
   <script src="/scripts/user.js"></script>
+  <script src="/scripts/laxuserverification.js"></script>
   <script src="/scripts/index.js"></script>
+
 </head>
 
 <body>
@@ -117,6 +119,34 @@
           </div>
           <input type="submit" value="Delete Freet">
         </form>
+
+        <form id="verify-user">
+          <h3>Verify</h3>
+          <div>
+            <label for="name">Name:</label>
+            <input id="name" name="name">
+          </div>
+          <div>
+            <label for="age">Age:</label>
+            <input id="age" name="age">
+          </div>
+          <input type="submit" value="Verify User">
+        </form>
+
+        <form id="see-verification-status">
+          <h3>See Verification Status</h3>
+          <input type="submit" value="See Verification Status">
+        </form>
+
+        <form id="see-verification-status-other">
+          <h3>See Verification Status of Another User</h3>
+          <div>
+            <label for="username">Username:</label>
+            <input id="username" name="username">
+          </div>
+          <input type="submit" value="See Verification Status of Another User">
+        </form>
+
       </div>
     </section>
     <section>

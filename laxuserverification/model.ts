@@ -3,20 +3,24 @@ import {Schema, model} from 'mongoose';
 
 export type Verification = {
   _id: Types.ObjectId; // MongoDB assigns each object this ID on creation
-  username: string;
-  verificationstatus: boolean;
+  verified: boolean;
+  name: string;
+  age: string;
 };
 
 const VerificationSchema = new Schema({
-  // The user's username
-  username: {
-    type: String,
-    required: true
-  },
-  // The user's verification status
-  verificationstatus: {
+  // The user's verification status, entered name, and age
+  verified: {
     type: Boolean,
     required: true
+  },
+  name: {
+    type: String,
+    required: false
+  },
+  age: {
+    type: String,
+    required: false
   }
 });
 
