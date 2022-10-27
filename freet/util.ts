@@ -9,6 +9,7 @@ type FreetResponse = {
   dateCreated: string;
   content: string;
   dateModified: string;
+  ageRestrictedViewing: string;
 };
 
 /**
@@ -34,12 +35,21 @@ const constructFreetResponse = (freet: HydratedDocument<Freet>): FreetResponse =
   };
   const {username} = freetCopy.authorId;
   delete freetCopy.authorId;
+
+  let restrictedviewing;
+  if (freetCopy.ageRestrictedViewing) {
+    restrictedviewing = 'true';
+  } else {
+    restrictedviewing = 'false';
+  }
+
   return {
     ...freetCopy,
     _id: freetCopy._id.toString(),
     author: username,
     dateCreated: formatDate(freet.dateCreated),
-    dateModified: formatDate(freet.dateModified)
+    dateModified: formatDate(freet.dateModified),
+    ageRestrictedViewing: restrictedviewing
   };
 };
 

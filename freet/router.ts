@@ -34,7 +34,7 @@ router.get(
       return;
     }
 
-    const allFreets = await FreetCollection.findAll();
+    const allFreets = await FreetCollection.findAll(req.session.userId as string);
     const response = allFreets.map(util.constructFreetResponse);
     res.status(200).json(response);
   },
@@ -42,7 +42,7 @@ router.get(
     userValidator.isAuthorExists
   ],
   async (req: Request, res: Response) => {
-    const authorFreets = await FreetCollection.findAllByUsername(req.query.author as string);
+    const authorFreets = await FreetCollection.findAllByUsername(req.query.author as string, req.session.userId as string);
     const response = authorFreets.map(util.constructFreetResponse);
     res.status(200).json(response);
   }
@@ -102,30 +102,37 @@ router.delete(
 );
 
 /**
- * Modify a freet
- *
- * @name PUT /api/freets/:id
- *
- * @param {string} content - the new content for the freet
  * @return {FreetResponse} - the updated freet
  * @throws {403} - if the user is not logged in or not the author of
  *                 of the freet
- * @throws {404} - If the freetId is not valid
- * @throws {400} - If the freet content is empty or a stream of empty spaces
- * @throws {413} - If the freet content is more than 140 characters long
  */
+// router.put(
+//   '/:freetId?',
+//   [
+//     userValidator.isUserLoggedIn,
+//     freetValidator.isFreetExists,
+//     freetValidator.isValidFreetModifier,
+//     freetValidator.isValidFreetContent
+//   ],
+//   async (req: Request, res: Response) => {
+//     const freet = await FreetCollection.updateOne(req.params.freetId, req.body.content);
+//     res.status(200).json({
+//       message: 'Your freet was updated successfully.',
+//       freet: util.constructFreetResponse(freet)
+//     });
+//   }
+// );
 router.put(
   '/:freetId?',
   [
     userValidator.isUserLoggedIn,
     freetValidator.isFreetExists,
-    freetValidator.isValidFreetModifier,
-    freetValidator.isValidFreetContent
+    freetValidator.isValidFreetModifier
   ],
   async (req: Request, res: Response) => {
-    const freet = await FreetCollection.updateOne(req.params.freetId, req.body.content);
+    const freet = await FreetCollection.ageRestrict(req.params.freetId);
     res.status(200).json({
-      message: 'Your freet was updated successfully.',
+      message: 'Your freet was age restricted successfully.',
       freet: util.constructFreetResponse(freet)
     });
   }

@@ -1,7 +1,6 @@
 import type {HydratedDocument, Types} from 'mongoose';
 import type {User} from './model';
 import UserModel from './model';
-import FollowCollection from '../follow/collection';
 
 /**
  * This file contains a class with functionality to interact with users stored
@@ -91,7 +90,6 @@ class UserCollection {
    * @return {Promise<Boolean>} - true if the user has been deleted, false otherwise
    */
   static async deleteOne(userId: Types.ObjectId | string): Promise<boolean> {
-    await FollowCollection.removeAllFollowsWithUser(userId);
     const user = await UserModel.deleteOne({_id: userId});
     return user !== null;
   }
