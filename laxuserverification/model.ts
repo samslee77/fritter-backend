@@ -9,15 +9,17 @@ export type Verification = {
 };
 
 const VerificationSchema = new Schema({
-  // The user's verification status, entered name, and age
+  // The user's verification status
   verified: {
     type: Boolean,
     required: true
   },
+  // The name the user enters to get verified
   name: {
     type: String,
     required: false
   },
+  // The age the user enters to get verified
   age: {
     type: String,
     required: false

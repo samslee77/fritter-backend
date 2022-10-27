@@ -26,7 +26,9 @@ class FreetCollection {
       dateCreated: date,
       content,
       dateModified: date,
-      ageRestrictedViewing: false
+      ageRestrictedViewing: false,
+      likes: 0,
+      dislikes: 0
     });
     await freet.save(); // Saves freet to MongoDB
     return freet.populate('authorId');

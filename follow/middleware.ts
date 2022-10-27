@@ -3,6 +3,7 @@ import {Types} from 'mongoose';
 import FollowCollection from '../follow/collection';
 import UserCollection from '../user/collection';
 
+// Checks if the username in req.body exists
 const doesUsernameExist = async (req: Request, res: Response, next: NextFunction) => {
   if (req.body.username) {
     const user = await UserCollection.findOneByUsername(req.body.username as string);
@@ -22,6 +23,7 @@ const doesUsernameExist = async (req: Request, res: Response, next: NextFunction
   next();
 };
 
+// Checks if the logged in user is already following the user with username in req.body
 const doesFollowExist = async (req: Request, res: Response, next: NextFunction) => {
   const followAccount = await UserCollection.findOneByUsername(req.body.username as string);
   const followUsersId = followAccount._id;
@@ -38,6 +40,7 @@ const doesFollowExist = async (req: Request, res: Response, next: NextFunction) 
   next();
 };
 
+// Checks if the logged in user is already following not following the user with username in req.body (so they can't try to unfollow them when the relationship doesn't exist)
 const doesFollowNotExist = async (req: Request, res: Response, next: NextFunction) => {
   const followAccount = await UserCollection.findOneByUsername(req.body.username as string);
   const followUsersId = followAccount._id;
@@ -54,6 +57,7 @@ const doesFollowNotExist = async (req: Request, res: Response, next: NextFunctio
   next();
 };
 
+// Checks if the logged in user has a follower with username in req.body
 const doesFollowerExist = async (req: Request, res: Response, next: NextFunction) => {
   const follower = await UserCollection.findOneByUsername(req.body.username as string);
   const followerId = follower._id;
@@ -70,6 +74,7 @@ const doesFollowerExist = async (req: Request, res: Response, next: NextFunction
   next();
 };
 
+// Checks if the user with username in req.body is the logged in user (they can't follow themselves)
 const isFollowUser = async (req: Request, res: Response, next: NextFunction) => {
   const currUser = await UserCollection.findOneByUserId((req.session.userId as string) ?? '');
 

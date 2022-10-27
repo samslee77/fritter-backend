@@ -10,6 +10,8 @@ type FreetResponse = {
   content: string;
   dateModified: string;
   ageRestrictedViewing: string;
+  likes: string;
+  dislikes: string;
 };
 
 /**
@@ -49,7 +51,9 @@ const constructFreetResponse = (freet: HydratedDocument<Freet>): FreetResponse =
     author: username,
     dateCreated: formatDate(freet.dateCreated),
     dateModified: formatDate(freet.dateModified),
-    ageRestrictedViewing: restrictedviewing
+    ageRestrictedViewing: restrictedviewing,
+    likes: freetCopy.likes.toString(),
+    dislikes: freetCopy.dislikes.toString()
   };
 };
 

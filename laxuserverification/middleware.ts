@@ -72,7 +72,7 @@ const isValidAge = (req: Request, res: Response, next: NextFunction) => {
   if (!ageRegex.test(req.body.age)) {
     res.status(400).json({
       error: {
-        username: 'Age must be a numeric string.'
+        username: 'Age must be a nonzero number (can not start with a 0).'
       }
     });
     return;

@@ -13,6 +13,7 @@ import {userRouter} from '../user/router';
 import {freetRouter} from '../freet/router';
 import {verificationRouter} from '../laxuserverification/router';
 import {followRouter} from '../follow/router';
+import {reactionRouter} from '../reactions/router';
 
 // Load environmental variables
 dotenv.config({});
@@ -80,6 +81,7 @@ app.use('/api/users', userRouter);
 app.use('/api/freets', freetRouter);
 app.use('/api/verification', verificationRouter);
 app.use('/api/Follow', followRouter);
+app.use('/api/reactions', reactionRouter);
 
 // Catch all the other routes and display error message
 app.all('*', (req: Request, res: Response) => {

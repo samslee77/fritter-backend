@@ -3,13 +3,11 @@ import type {Verification} from './model';
 import VerificationModel from './model';
 import UserCollection from '../user/collection';
 import type {User} from '../user/model';
-import {verificationRouter} from './router';
 
 class VerificationCollection {
   /**
-   * Update user's verification status
+   * Update user's verification status (User has verified him/herself)
    *
-   * @return {Promise<HydratedDocument<User>>}
    */
   static async updateOne(userId: Types.ObjectId | string, name: string, age: string): Promise<HydratedDocument<User>> {
     const user = await UserCollection.findOneByUserId(userId);
@@ -20,6 +18,10 @@ class VerificationCollection {
     return user;
   }
 
+  /**
+   * See the verification status of the user with username
+   *
+   */
   static async seeOne(username: string): Promise<HydratedDocument<Verification>> {
     const user = await UserCollection.findOneByUsername(username);
     const verification = new VerificationModel({verified: user.verified, name: user.name, age: user.age});

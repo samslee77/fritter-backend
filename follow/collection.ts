@@ -15,8 +15,6 @@ class FollowCollection {
   /**
    * Add a follow to the collection
    *
-   * @param {User} user - The author of the freet
-   * @return {Promise<HydratedDocument<User>>} - The newly added follower
    */
   static async addFollow(follower: Types.ObjectId | string, following: Types.ObjectId | string): Promise<HydratedDocument<Follow>> {
     const follow = new FollowModel({follower, following});
@@ -24,25 +22,45 @@ class FollowCollection {
     return follow.populate(['follower', 'following']);
   }
 
+  /**
+   * Remove a follow from the collection
+   *
+   */
   static async removeFollow(follower: Types.ObjectId | string, following: Types.ObjectId | string): Promise<void> {
     const follow = await FollowModel.deleteOne({follower, following});
   }
 
+  /**
+   * When a user deletes their account, remove all the follow relationships including that user
+   *
+   */
   static async removeAllFollowsWithUser(user: Types.ObjectId | string): Promise<void> {
     const delete1 = await FollowModel.deleteMany({follower: user});
     const delete2 = await FollowModel.deleteMany({following: user});
   }
 
+  /**
+   * Check if a follow relationship between follower and following exists, used for throwing errors
+   *
+   */
   static async viewFollow(follower: Types.ObjectId | string, following: Types.ObjectId | string): Promise<HydratedDocument<Follow>> {
     const follow = await FollowModel.findOne({follower, following});
     return follow;
   }
 
+  /**
+   * See all the logged in user's current followers
+   *
+   */
   static async viewAllFollowers(following: Types.ObjectId | string): Promise<Array<HydratedDocument<Follow>>> {
     const followers = await FollowModel.find({following: following}).populate(['follower', 'following']);
     return followers;
   }
 
+  /**
+   * See all the users that the logged in user is following
+   *
+   */
   static async viewAllFollowing(follower: Types.ObjectId | string): Promise<Array<HydratedDocument<Follow>>> {
     const followings = await FollowModel.find({follower: follower}).populate(['follower', 'following']);
     return followings;

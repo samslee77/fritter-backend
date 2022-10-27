@@ -13,7 +13,6 @@ const router = express.Router();
  *
  * @name GET /api/Follow/followers
  *
- * @return {Users[]} - A list of all the Users following the current User
  */
 router.get(
   '/followers',

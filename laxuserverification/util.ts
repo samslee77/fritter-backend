@@ -1,6 +1,5 @@
 import type {HydratedDocument} from 'mongoose';
 import moment from 'moment';
-import type {User} from '../user/model';
 import type {Verification} from './model';
 
 type VerificationResponse = {
@@ -14,7 +13,7 @@ const formatDate = (date: Date): string => moment(date).format('MMMM Do YYYY, h:
 
 /**
  *
- * @param {HydratedDocument<User>} User - A user object
+ * @param {HydratedDocument<Verification>} verification - A verification object
  * @returns {VerificationResponse} - the verification status, name, and age of user
  */
 const constructVerificationResponse = (verification: HydratedDocument<Verification>): VerificationResponse => {
