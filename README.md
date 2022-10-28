@@ -221,7 +221,6 @@ This renders the `index.html` file that will be used to interact with the backen
 - `403` if the user is not the author of the freet
 - `404` if the freetId is invalid
 
-**Am not including the edit function for Freet**
 <!-- #### `PUT /api/freets/:freetId?` - Update an existing freet **will NOT be available in my Fritter implementation since I chose to not allow users to edit Freets
 
 **Body**
@@ -318,13 +317,15 @@ This renders the `index.html` file that will be used to interact with the backen
 
 **ALL ADDED FROM HERE**
 
+**Sidenote that I am not including the edit function for Freet since that was part of my design from earlier assignments**
+
 AgeRestrictedViewing (basically another api for Freet)
 #### `PUT /api/freets/${fields.id}` - Make a freet age-restricted
 
 **Returns**
 
 - A success message
-- A Freet object
+- A Freet object with agerestrictedviewing parameter changed from false to true
 
 **Throws**
 
@@ -338,7 +339,7 @@ For Follow
 **Returns**
 
 - A success message
-- An object(list) with other user objects(usernames, etc.) of the users that are following the current user
+- A list of other user objects(usernames, etc.) of the users that are following the current user
 
 **Throws**
 
@@ -349,7 +350,7 @@ For Follow
 **Returns**
 
 - A success message
-- An object(list) with other user objects(usernames, etc.) of the users that are following the currently logged in user
+- An list of other user objects(usernames, etc.) of the users that are following the currently logged in user
 
 **Throws**
 
@@ -357,7 +358,7 @@ For Follow
 
 #### `POST /api/following` - User follows another user
 
-**Body** _(no need to add fields that are not being changed)_
+**Body**
 
 - `username` _{string}_ - The username of the user that the current user wants to follow
 
@@ -376,7 +377,7 @@ For Follow
 
 #### `DELETE /api/Follow` - Unfollow another user
 
-**Body** _(no need to add fields that are not being changed)_
+**Body** 
 
 - `username` _{string}_ - The username of the user that the current user wants to unfollow
 
@@ -392,7 +393,7 @@ For Follow
 
 #### `DELETE /api/Follow/remove` - Remove a follower
 
-**Body** _(no need to add fields that are not being changed)_
+**Body** 
 
 - `username` _{string}_ - The username of the user that the current user wants to remove from their followers
 
