@@ -175,13 +175,13 @@ The following api routes have already been implemented for you (**Make sure to d
 
 This renders the `index.html` file that will be used to interact with the backend
 
-#### `GET /api/freets` - Get all the freets
+#### `GET /api/freets` - Get all the freets **ADDED** that the user can see (if a feed is age restricted, then the user will only be able to see that freet if he/she is verified and above 17)
 
 **Returns**
 
 - An array of all freets sorted in descending order by date modified
 
-#### `GET /api/freets?author=USERNAME` - Get freets by author
+#### `GET /api/freets?author=USERNAME` - Get freets by author **ADDED** that the user can see (if a feed is age restricted, then the user will only be able to see that freet if he/she is verified and above 17, someone who is not logged in will be treated as an unverified user)
 
 **Returns**
 
@@ -221,7 +221,8 @@ This renders the `index.html` file that will be used to interact with the backen
 - `403` if the user is not the author of the freet
 - `404` if the freetId is invalid
 
-#### `PUT /api/freets/:freetId?` - Update an existing freet **will NOT be available in my Fritter implementation since I chose to not allow users to edit Freets
+**Am not including the edit function for Freet**
+<!-- #### `PUT /api/freets/:freetId?` - Update an existing freet **will NOT be available in my Fritter implementation since I chose to not allow users to edit Freets
 
 **Body**
 
@@ -238,7 +239,7 @@ This renders the `index.html` file that will be used to interact with the backen
 - `404` if the freetId is invalid
 - `403` if the user is not the author of the freet
 - `400` if the new freet content is empty or a stream of empty spaces
-- `413` if the new freet content is more than 140 characters long
+- `413` if the new freet content is more than 140 characters long -->
 
 #### `POST /api/users/session` - Sign in user
 
@@ -317,8 +318,22 @@ This renders the `index.html` file that will be used to interact with the backen
 
 **ALL ADDED FROM HERE**
 
+AgeRestrictedViewing (basically another api for Freet)
+#### `PUT /api/freets/${fields.id}` - Make a freet age-restricted
+
+**Returns**
+
+- A success message
+- A Freet object
+
+**Throws**
+
+- `403` if the user is not logged in
+- `404` if the Freet doesn't exist
+- `403` if the logged in user isn't the user who wrote the freet
+
 For Follow
-#### `GET /api/followers` - Current user sees their followers
+#### `GET /api/Follow/following` - Current user sees users they are following
 
 **Returns**
 
@@ -329,18 +344,18 @@ For Follow
 
 - `403` if the user is not logged in
 
-#### `GET /api/following` - Current user sees users they're following
+#### `GET /api/Follow/followers` - Current user sees their followers
 
 **Returns**
 
 - A success message
-- An object(list) with other user objects(usernames, etc.) of the users that the current user is following
+- An object(list) with other user objects(usernames, etc.) of the users that are following the currently logged in user
 
 **Throws**
 
 - `403` if the user is not logged in
 
-#### `PUT /api/following` - User follows another user
+#### `POST /api/following` - User follows another user
 
 **Body** _(no need to add fields that are not being changed)_
 
@@ -349,15 +364,17 @@ For Follow
 **Returns**
 
 - A success message
-- A list of the users that the current user is following
+- A Follow type object
 
 **Throws**
 
 - `403` if the user is not logged in
 - `404` if no user with username exists
 - `409` if the user is already following the given user with `username`
+- `409` if the user the user is trying to follow is themself
+- `400` if the username is an empty string
 
-#### `DELETE /api/following` - Unfollow another user
+#### `DELETE /api/Follow` - Unfollow another user
 
 **Body** _(no need to add fields that are not being changed)_
 
@@ -366,15 +383,14 @@ For Follow
 **Returns**
 
 - A success message
-- A list of the users that the current user is following
 
 **Throws**
 
 - `403` if the user is not logged in
 - `404` if no user with username exists
-- `409` if the user has already been removed
+- `404` if the logged in user is not following the user they want to unfollow
 
-#### `DELETE /api/follower` - Remove a follower
+#### `DELETE /api/Follow/remove` - Remove a follower
 
 **Body** _(no need to add fields that are not being changed)_
 
@@ -383,74 +399,43 @@ For Follow
 **Returns**
 
 - A success message
-- A list of the current user's followers
 
 **Throws**
 
 - `403` if the user is not logged in
 - `404` if no user with username exists
-- `409` if the follower has already been removed
+- `404` if the logged in user does not have a follower with the given username
 
-#### `GET /api/followers?username=USERNAME` - Get the followers of the user with `username`
 
-**Returns**
-
-- A success message
-- An object(list) with the followers of the specified user with username
-
-**Throws**
-
-- `403` if the user is not logged in
-- `404` if no user with username exists
-
-#### `GET /api/following?username=USERNAME` - Get the users that the user with `username` is following
+For Reaction (implemented for ConsensusFilter)
+#### `POST /api/reactions/like` - Like a Freet
 
 **Returns**
 
 - A success message
-- An object(list) with the users that the specified user is following
+- A reaction object
 
 **Throws**
 
 - `403` if the user is not logged in
-- `404` if no user with username exists
+- `404` if the freetId is invalid (doesn't exist)
+- `409` if the user has already reacted to the freet (like or dislike, can not do both)
 
 
-For ConsensusFilter
-#### `PUT /api/freets/:freetId?reaction=REACTION` - Add a downvote to a freet with ID freetId
+#### `POST /api/reactions/dislike` - Dislike a freet
 
 **Returns**
 
 - A success message
-- An object with the updated freet (the added downvote)
+- A reaction object
 
 **Throws**
 
 - `403` if the user is not logged in
-- `404` if the freetId is invalid
-- `409` if the user has already downvoted the freet
+- `404` if the freetId is invalid (doesn't exist)
+- `403` if the user has already reacted to the freet (like or dislike, can not do both)
 
-
-#### `DELETE /api/freets/:freetID?reaction=REACTION` - Remove the downvote from the freet
-
-**Returns**
-
-- A success message
-- An object with the updated freet(one less downvote)
-
-**Throws**
-
-- `403` if the user is not logged in
-- `404` if the freetId is invalid
-- `409` if the user has already removed their downvote from the freet
-
-
-For CounterConsensusFilter
-
-#### `POST /api/request?freetId=ID` - Request for a freet with freetId ID to be reviewed
-
-**Body**
-- `reason` _{string}_ - The reason why the user thinks their post should be unfiltered.
+#### `DELETE /api/reactions/like` - Remove a like from a freet
 
 **Returns**
 
@@ -460,11 +445,9 @@ For CounterConsensusFilter
 
 - `403` if the user is not logged in
 - `404` if the freetId is invalid
-- `403` if the freet with given freetId has already been requested before
-- `403` if the user is not the author of the freet
-- `409` if the user has already requested for the freet to be reviewed
+- `404` if the user has not liked the freet
 
-#### `DELETE /api/request?freetId=ID` - Delete the request asking for the freet with freetID to be reviewed
+#### `DELETE /api/reactions/dislike` - Remove a dislike from a freet
 
 **Returns**
 
@@ -474,97 +457,47 @@ For CounterConsensusFilter
 
 - `403` if the user is not logged in
 - `404` if the freetId is invalid
-- `403` if the user is not the author of the freet
-- `409` if the user has already deleted their request
-
-
-For AgeRestrictedViewing(just a simple addition to the Freet APIs)
-#### `POST /api/freet?audience=AUDIENCE` - Post an age restricted freet (where directed audience is AUDIENCE)
-
-**Body**
-- `content` _{string}_ - The content of the freet.
-
-**Returns**
-
-- A success message
-- An object with the created freet
-
-**Throws**
-
-- `403` if the user is not logged in
-- `400` If the freet content is empty or a stream of empty spaces
-- `413` If the freet content is more than 140 characters long
-
-#### `DELETE /api/freets?audience=AUDIENCE` - Delete all the Freets that were directed towards a certain audience from a user 
-
-**Returns**
-
-- A success message
-
-**Throws**
-
-- `403` if the user is not logged in
-- `404` if the user has not created any freets directed towards the given audience
-- `409` if the user has already deleted these freets
-
-#### `GET /api/freets?author=USERNAME&audience=AUDIENCE`
-
-**Returns**
-
-- An array of freets created by user with username `author` and directed towards an audience within an age limit `audience`
-
-**Throws**
-
-- `403` if the user is not logged in
-- `400` if `author` is not given
-- `404` if `author` is not a recognized name of a user who has created any post directed towards the provided audience
-
+- `404` if the user has not disliked the freet
 
 For LaxUserVerification
 
-#### `GET /api/verificationstatus?username=USERNAME` - Get the verification status of the user with the provided username
+#### `GET '/api/verification` - Get the verification status of the user with the provided username
 
 **Returns**
 
-- The verification status ('verified' or 'unverified') of the user with username `USERNAME`
+- A verification object showing the verification status (true or false for the value of the `verified` key) of the logged in user
 
 **Throws**
 
 - `403` if the user is not logged in
+
+#### `GET '/api/verification?username=${fields.username}` - Get the verification status of the user with the provided username
+
+**Returns**
+
+- The verification status (true or false for the value of the `verified` key) of the user with username `USERNAME`
+
+**Throws**
+
 - `404` if `username` is not a recognized username of any user
 
-#### `POST /api/verification?method=passport` - verifying by passport
+#### `PUT /api/verification` - Verify yourself
 
 **Body**
-- `passport` _{file}_ - The passport the user is providing to be authenticated.
+- `name` the name of the user (representing the name displayed on an ID)
+- `age` the age of the user (representing the age displayed on ID)
 
 **Returns**
 
 - A success message
-- The verification status ('verified' or 'unverified') of the user with username `USERNAME`
+- The verification status (true of false in the value for the key `verified`) of the user with username `USERNAME`
 
 **Throws**
 
 - `403` if the user is not logged in
-- `400` if the provided passport is not valid
 - `409` if the user has already been verified
-
-#### `POST /api/verification?method=ID` - verifying by ID
-
-**Body**
-- `ID` _{file}_ - The ID the user is providing to be authenticated.
-
-**Returns**
-
-- A success message
-- The verification status ('verified' or 'unverified') of the user with username `USERNAME`
-
-**Throws**
-
-- `403` if the user is not logged in
-- `400` if the provided ID is not valid
-- `409` if the user has already been verified
-
+- `400` if the entered name is not a valid name
+- `403` if the user is already verified
 
 
 

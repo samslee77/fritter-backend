@@ -14,7 +14,7 @@ const doesUsernameExist = async (req: Request, res: Response, next: NextFunction
       return;
     }
   } else {
-    res.status(404).json({
+    res.status(400).json({
       error: 'Provided username must be nonempty.'
     });
     return;
@@ -31,7 +31,7 @@ const doesFollowExist = async (req: Request, res: Response, next: NextFunction) 
   const currUserId = (req.session.userId as string) ?? '';
   const follow = await FollowCollection.viewFollow(currUserId, followUsersId);
   if (follow) {
-    res.status(403).json({
+    res.status(404).json({
       error: `You are already following the user with username ${req.body.username as string}.`
     });
     return;

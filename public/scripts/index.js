@@ -39,7 +39,6 @@ const formsAndHandlers = {
   'create-freet': createFreet,
   // 'edit-freet': editFreet,
   'make-freet-age-restricted': ageRestrictFreet,
-  'make-freet-not-age-restricted': removeAgeRestrictionFromFreet,
   'like-freet': like,
   'remove-like-from-freet': removeLike,
   'dislike-freet': dislike,

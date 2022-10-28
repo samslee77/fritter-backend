@@ -35,12 +35,6 @@ function ageRestrictFreet(fields) {
     .catch(showResponse);
 }
 
-function removeAgeRestrictionFromFreet(fields) {
-  fetch(`/api/freets/${fields.id}`, {method: 'PUT'})
-    .then(showResponse)
-    .catch(showResponse);
-}
-
 function deleteFreet(fields) {
   fetch(`/api/freets/${fields.id}`, {method: 'DELETE'})
     .then(showResponse)
