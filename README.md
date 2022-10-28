@@ -175,13 +175,13 @@ The following api routes have already been implemented for you (**Make sure to d
 
 This renders the `index.html` file that will be used to interact with the backend
 
-#### `GET /api/freets` - Get all the freets **ADDED** that the user can see (if a feed is age restricted, then the user will only be able to see that freet if he/she is verified and above 17)
+#### `GET /api/freets` - Get all the freets **ADDED** that the user can see. If a feed is age restricted, then the user will only be able to see that freet if he/she is verified and above 17. Someone who is not logged in will be treated as an unverified user. Lastly, the user will only be able to see the freet if it is not "consensusfiltered".
 
 **Returns**
 
 - An array of all freets sorted in descending order by date modified
 
-#### `GET /api/freets?author=USERNAME` - Get freets by author **ADDED** that the user can see (if a feed is age restricted, then the user will only be able to see that freet if he/she is verified and above 17, someone who is not logged in will be treated as an unverified user)
+#### `GET /api/freets?author=USERNAME` - Get freets by author **ADDED** that the user can see. If a feed is age restricted, then the user will only be able to see that freet if he/she is verified and above 17. Someone who is not logged in will be treated as an unverified user. Lastly, the user will only be able to see the freet if it is not "consensusfiltered".
 
 **Returns**
 
@@ -411,6 +411,10 @@ For Follow
 For Reaction (implemented for ConsensusFilter)
 #### `POST /api/reactions/like` - Like a Freet
 
+**Body** 
+
+- `freetId` _{string}_ - The id of the freet that the user is liking
+
 **Returns**
 
 - A success message
@@ -425,6 +429,10 @@ For Reaction (implemented for ConsensusFilter)
 
 #### `POST /api/reactions/dislike` - Dislike a freet
 
+**Body** 
+
+- `freetId` _{string}_ - The id of the freet that the user is disliking
+
 **Returns**
 
 - A success message
@@ -438,6 +446,10 @@ For Reaction (implemented for ConsensusFilter)
 
 #### `DELETE /api/reactions/like` - Remove a like from a freet
 
+**Body** 
+
+- `freetId` _{string}_ - The id of the freet that the user is removing their like from
+
 **Returns**
 
 - A success message
@@ -450,6 +462,9 @@ For Reaction (implemented for ConsensusFilter)
 
 #### `DELETE /api/reactions/dislike` - Remove a dislike from a freet
 
+**Body** 
+
+- `freetId` _{string}_ - The idea of the freet that the user is removing their dislike from
 **Returns**
 
 - A success message
@@ -462,10 +477,11 @@ For Reaction (implemented for ConsensusFilter)
 
 For LaxUserVerification
 
-#### `GET '/api/verification` - Get the verification status of the user with the provided username
+#### `GET /api/verification` - Get the verification status of the user with the provided username
 
 **Returns**
 
+- A success message
 - A verification object showing the verification status (true or false for the value of the `verified` key) of the logged in user
 
 **Throws**
@@ -476,6 +492,7 @@ For LaxUserVerification
 
 **Returns**
 
+- A success message
 - The verification status (true or false for the value of the `verified` key) of the user with username `USERNAME`
 
 **Throws**
