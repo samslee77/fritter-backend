@@ -40,7 +40,7 @@ router.get(
     const verification = await VerificationCollection.seeOne(username);
     res.status(200).json({
       message: 'Here is the users verification status.',
-      user: util.constructVerificationResponse(verification)
+      verification: util.constructVerificationResponse(verification)
     });
   },
   [
@@ -52,7 +52,7 @@ router.get(
     const verification = await VerificationCollection.seeOne(user.username);
     res.status(200).json({
       message: 'Here is your verification status.',
-      user: util.constructVerificationResponse(verification)
+      verification: util.constructVerificationResponse(verification)
     });
   }
 );

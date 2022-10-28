@@ -1,14 +1,20 @@
 import type {Types} from 'mongoose';
 import {Schema, model} from 'mongoose';
+import type {User} from '../user/model';
 
 export type Verification = {
   _id: Types.ObjectId; // MongoDB assigns each object this ID on creation
+  user: Types.ObjectId;
   verified: boolean;
   name: string;
   age: string;
 };
 
 const VerificationSchema = new Schema({
+  user: {
+    type: Schema.Types.ObjectId,
+    required: true
+  },
   // The user's verification status
   verified: {
     type: Boolean,

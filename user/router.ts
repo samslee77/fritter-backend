@@ -4,6 +4,7 @@ import FreetCollection from '../freet/collection';
 import UserCollection from './collection';
 import FollowCollection from '../follow/collection';
 import ReactionCollection from '../reactions/collection';
+import VerificationCollection from '../laxuserverification/collection';
 import * as userValidator from '../user/middleware';
 import * as util from './util';
 
@@ -145,6 +146,7 @@ router.delete(
     await FreetCollection.deleteMany(userId);
     await FollowCollection.removeAllFollowsWithUser(userId);
     await ReactionCollection.removeAllReactionsWithUser(userId);
+    await VerificationCollection.removeOne(userId);
     req.session.userId = undefined;
     res.status(200).json({
       message: 'Your account has been deleted successfully.'
