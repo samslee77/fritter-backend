@@ -28,7 +28,8 @@ class FreetCollection {
       dateModified: date,
       ageRestrictedViewing: false,
       likes: 0,
-      dislikes: 0
+      dislikes: 0,
+      consensusfiltered: false
     });
     await freet.save(); // Saves freet to MongoDB
     return freet.populate('authorId');
@@ -55,9 +56,9 @@ class FreetCollection {
     const loggedInUser = await UserCollection.findOneByUserId(userId);
     let ret;
     if (loggedInUser && loggedInUser.age !== 'unknown' && parseInt(loggedInUser.age, 10) >= 18) {
-      ret = FreetModel.find({}).sort({dateModified: -1}).populate('authorId');
+      ret = FreetModel.find({consensusfiltered: false}).sort({dateModified: -1}).populate('authorId');
     } else {
-      ret = FreetModel.find({$or: [{ageRestrictedViewing: false}, {authorId: userId}]}).sort({dateModified: -1}).populate('authorId');
+      ret = FreetModel.find({$or: [{ageRestrictedViewing: false, consensusfiltered: false}, {authorId: userId, consensusfiltered: false}]}).sort({dateModified: -1}).populate('authorId');
     }
 
     return ret;
@@ -76,9 +77,9 @@ class FreetCollection {
     const loggedInUser = await UserCollection.findOneByUserId(userId);
     let ret;
     if (loggedInUser && loggedInUser.age !== 'unknown' && parseInt(loggedInUser.age, 10) >= 18) {
-      ret = FreetModel.find({authorId: author._id}).sort({dateModified: -1}).populate('authorId');
+      ret = FreetModel.find({authorId: author._id, consensusfiltered: false}).sort({dateModified: -1}).populate('authorId');
     } else {
-      ret = FreetModel.find({authorId: author._id, ageRestrictedViewing: false}).sort({dateModified: -1}).populate('authorId');
+      ret = FreetModel.find({authorId: author._id, ageRestrictedViewing: false, consensusfiltered: false}).sort({dateModified: -1}).populate('authorId');
     }
 
     return ret;

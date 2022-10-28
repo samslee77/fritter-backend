@@ -37,6 +37,7 @@ const constructFreetResponse = (freet: HydratedDocument<Freet>): FreetResponse =
   };
   const {username} = freetCopy.authorId;
   delete freetCopy.authorId;
+  delete freetCopy.consensusfiltered; // we shouldn't show this to user
 
   let restrictedviewing;
   if (freetCopy.ageRestrictedViewing) {

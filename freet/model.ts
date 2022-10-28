@@ -17,6 +17,7 @@ export type Freet = {
   ageRestrictedViewing: boolean;
   likes: number;
   dislikes: number;
+  consensusfiltered: boolean;
 };
 
 export type PopulatedFreet = {
@@ -28,6 +29,7 @@ export type PopulatedFreet = {
   ageRestrictedViewing: boolean;
   likes: number;
   dislikes: number;
+  consensusfiltered: boolean;
 };
 
 // Mongoose schema definition for interfacing with a MongoDB table
@@ -66,6 +68,10 @@ const FreetSchema = new Schema<Freet>({
   },
   dislikes: {
     type: Number,
+    required: true
+  },
+  consensusfiltered: {
+    type: Boolean,
     required: true
   }
 });

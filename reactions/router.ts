@@ -26,6 +26,12 @@ router.post(
     const addLike = await ReactionCollection.addLike(freetId, userId);
     const originalFreet = await FreetCollection.findOne(freetId);
     originalFreet.likes += 1;
+    const likes = originalFreet.likes;
+    const dislikes = originalFreet.dislikes;
+    if ((likes + dislikes > 5) && dislikes / (likes + dislikes) > 0.8) {
+      originalFreet.consensusfiltered = true;
+    }
+
     await originalFreet.save();
     res.status(201).json({
       message: 'Your like was added successfully.',
@@ -51,6 +57,12 @@ router.post(
     const addDislike = await ReactionCollection.addDislike(freetId, userId);
     const originalFreet = await FreetCollection.findOne(freetId);
     originalFreet.dislikes += 1;
+    const likes = originalFreet.likes;
+    const dislikes = originalFreet.dislikes;
+    if ((likes + dislikes > 5) && dislikes / (likes + dislikes) > 0.8) {
+      originalFreet.consensusfiltered = true;
+    }
+
     await originalFreet.save();
     res.status(201).json({
       message: 'Your dislike was added successfully.',
@@ -76,6 +88,14 @@ router.delete(
     await ReactionCollection.removeReaction(freetId, userId);
     const originalFreet = await FreetCollection.findOne(freetId);
     originalFreet.likes -= 1;
+    const likes = originalFreet.likes;
+    const dislikes = originalFreet.dislikes;
+    if ((likes + dislikes > 5) && dislikes / (likes + dislikes) > 0.8) {
+      originalFreet.consensusfiltered = true;
+    } else {
+      originalFreet.consensusfiltered = false;
+    }
+
     await originalFreet.save();
     res.status(201).json({
       message: 'You have successfully removed your like from the freet.'
@@ -100,6 +120,14 @@ router.delete(
     await ReactionCollection.removeReaction(freetId, userId);
     const originalFreet = await FreetCollection.findOne(freetId);
     originalFreet.dislikes -= 1;
+    const likes = originalFreet.likes;
+    const dislikes = originalFreet.dislikes;
+    if ((likes + dislikes > 5) && dislikes / (likes + dislikes) > 0.8) {
+      originalFreet.consensusfiltered = true;
+    } else {
+      originalFreet.consensusfiltered = false;
+    }
+
     await originalFreet.save();
     res.status(201).json({
       message: 'You have successfully removed your dislike from the freet.'

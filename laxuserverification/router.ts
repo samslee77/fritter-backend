@@ -60,13 +60,6 @@ router.get(
 /**
  * Update a user's verification status
  *
- * @name PUT /api/users
- *
- * @param {string} verificationStatus - The user's new verification status
- * @return {UserResponse} - The updated user
- * @throws {403} - If user is not logged in
- * @throws {409} - If username already taken
- * @throws {400} - If username or password are not of the correct format
  */
 router.put(
   '/',

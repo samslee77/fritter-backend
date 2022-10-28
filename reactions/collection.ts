@@ -8,9 +8,6 @@ class ReactionCollection {
    *
    * Check if the user with user Id has reacted to a freet, needed for the middleware to ensure that a user doesn't react multiple times
    *
-   * @param freetId the freet Id of the freet
-   * @param userId  the user Id of the user
-   * @return {Promise<HydratedDocument<Reaction>> | Promise<null>}
    */
   static async findReaction(freetId: Types.ObjectId | string, userId: Types.ObjectId | string): Promise<HydratedDocument<Reaction>> {
     return ReactionModel.findOne({user: userId, freet: freetId});
